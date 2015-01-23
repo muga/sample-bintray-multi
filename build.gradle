@@ -19,10 +19,10 @@ allprojects {
     apply plugin: 'com.jfrog.bintray'
 
     group = 'org.muga'
-    version = '0.1.0'
+    version = '0.2.0'
 
 
-    // http://dl.bintray.com/muga/sample01-bintray/muga/sample-bintray/0.1.0/
+    // please see https://bintray.com/muga/maven/sample-bintray-multi
     bintray {
         user = project.getProperty('bintrayUser')
 	key = project.getProperty('bintrayApiKey')
