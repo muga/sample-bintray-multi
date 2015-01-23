@@ -1,0 +1,4 @@
+rootProject.name = 'sample-bintray-multi'
+
+include 'aaa'
+include 'bbb'

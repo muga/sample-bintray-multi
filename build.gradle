@@ -1,0 +1,111 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        jcenter()
+    }
+    dependencies {
+        classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:0.6"
+    }
+}
+
+allprojects {
+    repositories {
+        mavenLocal()
+        jcenter()
+    }
+
+    apply plugin: 'maven'
+    apply plugin: 'maven-publish'
+    apply plugin: 'com.jfrog.bintray'
+
+    group = 'org.muga'
+    version = '0.1.0'
+
+
+    // http://dl.bintray.com/muga/sample01-bintray/muga/sample-bintray/0.1.0/
+    bintray {
+        user = project.getProperty('bintrayUser')
+	key = project.getProperty('bintrayApiKey')
+
+        publications = ['mavenJava']
+
+        dryRun = false
+        publish = true
+        pkg {
+            repo = 'maven'
+            name = 'sample-bintray-multi'
+            desc = 'what a fantastic package indeed!'
+            websiteUrl = 'https://github.com/muga/sample-bintray-multi/'
+            issueTrackerUrl = 'https://github.com/muga/sample-bintray-multi/issues'
+            vcsUrl = 'https://github.com/muga/sample-bintray-multi.git'
+            licenses = ['Apache-2.0']
+            labels = ['example', 'gradle', 'bintray']
+            publicDownloadNumbers = true
+            version {
+                name = project.version
+                desc = 'optional, version-specific descriptio'
+
+                //mavenCentralSync {
+                //    sync = false
+                //    user = 'userToken'
+                //    password = 'paasword'
+                //    close = '1'
+                //}
+            }
+        }
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+
+    sourceCompatibility = 1.7
+    targetCompatibility = 1.7
+
+    dependencies {
+        // The production code uses the SLF4J logging API at compile time
+        compile 'org.slf4j:slf4j-api:1.7.5'
+
+        // Declare the dependency for your favourite test framework you want to use in your tests.
+        // TestNG is also supported by the Gradle Test task. Just change the
+        // testCompile dependency to testCompile 'org.testng:testng:6.8.1' and add
+        // 'test.useTestNG()' to your build script.
+        testCompile "junit:junit:4.11"
+    }
+
+
+    // custom tasks for creating source/javadoc jars
+    task sourcesJar(type: Jar, dependsOn: classes) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        classifier = 'javadoc'
+        from javadoc.destinationDir
+    }
+
+    // add javadoc/source jar tasks as artifacts
+    artifacts {
+        archives sourcesJar, javadocJar
+    }
+
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                groupId project.group
+                artifactId project.name
+                version project.version
+
+                if (plugins.hasPlugin('war')) {
+                    from components.web
+                } else {
+                    from components.java
+                }
+
+                artifact sourcesJar
+                artifact javadocJar
+            }
+        }
+    }
+}
